@@ -1,0 +1,17 @@
+aws lambda create-function
+  --function-name lambda01 \
+  --zip-file fileb://target/lambda01-0.1.jar \
+  --handler com.roberto.aws.lambda.FunctionHello::handleRequest \
+  --runtime java11 \
+  --role arn:aws:iam::123456789:role/developer
+
+ aws lambda invoke 
+   --function-name arn:aws:lambda:us-east-1:123456789:function:lambda01 \
+   --invocation-type RequestResponse ./outfile.txt
+
+aws lambda invoke 
+   --region=us-east-1 
+   --function-name=$(terraform output -raw function_name) response.json
+
+export AWS_ACCESS_KEY_ID=
+export AWS_SECRET_ACCESS_KEY=
