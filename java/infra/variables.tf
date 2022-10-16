@@ -5,3 +5,8 @@ variable "aws_region" {
   type        = string
   default     = "us-east-1"
 }
+
+variable "lab_role_arn" {
+  description =  "ARN of the role already created to use"
+  type        = string
+}

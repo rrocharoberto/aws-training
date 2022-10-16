@@ -1,3 +1,8 @@
+locals {
+  base_name          = "aws-training-${random_integer.base_number.id}"
+  lambda_source_file = "${path.module}/../app/lambda01/target/lambda01-0.1.jar"
+}
+
 terraform {
   required_providers {
     aws = {
@@ -14,42 +19,37 @@ provider "aws" {
     tags = {
       Environment = "Test"
       Owner       = "Roberto Rocha"
-      BuildNumber = random_pet.base_name.id
+      BuildNumber = local.base_name
     }
   }
 }
 
-resource "random_pet" "base_name" {
-  prefix = "aws-training-"
-  length = 4
+resource "random_integer" "base_number" {
+  min = 1000
+  max = 9999
 }
 
 resource "aws_lambda_function" "lambda_hello_world" {
-  function_name = "lambda-${random_pet.base_name.id}"
+  function_name = "lambda-${local.base_name}"
   description   = "My first lambda function :)."
   handler       = "com.roberto.aws.lambda.FunctionHello"
   runtime       = "java11"
 
   s3_bucket = aws_s3_bucket.lambda_bucket.id
-  s3_key    = aws_s3_object.lambda_hello_world.key
+  s3_key    = aws_s3_object.s3_object_hello_world.key
 
-  source_code_hash = data.archive_file.file_hello_world.output_base64sha256
+  source_code_hash = filebase64sha256(local.lambda_source_file)
 
-  role = aws_iam_role.lambda_exec_role.arn
+  role = var.lab_role_arn
+  # != "" ? var.lab_role_arn : aws_iam_role.lambda_exec_role.arn
   tags = {
-      Name   = "lambda-${random_pet.base_name.id}"
+      Name   = "lambda-${local.base_name}"
       Type   = "Lambda"
   }
 }
 
-data "archive_file" "file_hello_world" {
-  type = "zip"
-  source_file = "${path.module}/../app/lambda01/target/lambda01-0.1.jar"
-  output_path = "${path.module}/hello-world.zip"
-}
-
 resource "aws_s3_bucket" "lambda_bucket" {
-  bucket = "bucket-${random_pet.base_name.id}"
+  bucket = "bucket-${local.base_name}"
 }
 
 resource "aws_s3_bucket_acl" "bucket_acl" {
@@ -57,13 +57,11 @@ resource "aws_s3_bucket_acl" "bucket_acl" {
   acl    = "private"
 }
 
-resource "aws_s3_object" "lambda_hello_world" {
+resource "aws_s3_object" "s3_object_hello_world" {
   bucket = aws_s3_bucket.lambda_bucket.id
-
-  key    = "hello-world.zip"
-  source = data.archive_file.file_hello_world.output_path
-
-  etag = filemd5(data.archive_file.file_hello_world.output_path)
+  key    = "lambda-hello-world.jar"
+  source = local.lambda_source_file
+  etag   = filemd5(local.lambda_source_file)
 }
 
 resource "aws_cloudwatch_log_group" "hello_world_lg" {
@@ -72,23 +70,48 @@ resource "aws_cloudwatch_log_group" "hello_world_lg" {
 }
 
 resource "aws_iam_role" "lambda_exec_role" {
-  name = "serverless_lambda"
+  count = var.lab_role_arn == "" ? 1 : 0
+  name = "lambda-role-${local.base_name}"
 
+  managed_policy_arns = [
+      "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+      "arn:aws:iam::aws:policy/AWSLambdaExecute", 
+      "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+#      ,aws_iam_policy.lambda_policy.arn
+    ]
+  
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Sid    = ""
-      Principal = {
-        Service = "lambda.amazonaws.com"
-      }
-      }
+        Effect = "Allow"
+        Action = ["s3:ListAllMyBuckets", "s3:ListBucket", "s3:HeadBucket"]
+        Resource = [aws_s3_bucket.lambda_bucket.arn]
+      },
+      {
+        Effect = "Allow"
+        Action = ["s3:GetObject"]
+        Resource = [aws_s3_object.s3_object_hello_world.acl]
+      },
     ]
-  })
+    })
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_policy_att" {
-  role       = aws_iam_role.lambda_exec_role.name
+  count = var.lab_role_arn == "" ? 1 : 0
+  role       = aws_iam_role.lambda_exec_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
+
+# resource "aws_iam_policy" "lambda_policy" {
+#   name = "lambda-policy-${local.base_name}"
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Action   = ["s3:ListAllMyBuckets", "s3:ListBucket", "s3:HeadBucket"],
+#         Effect   = "Allow",
+#         Resource = "*"
+#       },
+#     ]
+#   })
+# }

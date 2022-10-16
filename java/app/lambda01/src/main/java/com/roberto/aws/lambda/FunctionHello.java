@@ -7,6 +7,7 @@ public class FunctionHello implements RequestHandler<String, String> {
     
     @Override
     public String handleRequest(String inMessage, Context context) {
+        context.getLogger().log("Message received in lambda: " + inMessage);
 
         return "Hello " + inMessage + " from " + context.getFunctionName();
     }
