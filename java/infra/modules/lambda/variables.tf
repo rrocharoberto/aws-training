@@ -3,7 +3,16 @@
 variable "aws_region" {
   description = "AWS region for all resources."
   type        = string
-  default     = "us-east-1"
+}
+
+variable "base_name" {
+  description =  "Base name to use in the lambda name."
+  type        = string
+}
+
+variable "lambda_source_file" {
+  description =  "Path to the file that contains the lambda code."
+  type        = string
 }
 
 variable "lab_role_arn" {
