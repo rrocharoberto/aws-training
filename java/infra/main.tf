@@ -1,6 +1,7 @@
 locals {
   base_name          = "aws-training-${random_integer.base_number.id}"
-  lambda_source_file = "${path.module}/../app/lambda01/target/lambda01-0.1.jar"
+  lambda01_source_file = "${path.module}/../app/lambda01/target/lambda01-0.1.jar"
+  lambda02_source_file = "${path.module}/../app/lambda02/target/lambda02-0.1.jar"
 }
 
 terraform {
@@ -30,10 +31,33 @@ resource "random_integer" "base_number" {
   max = 9999
 }
 
-module "lambda" {
-    source = "./modules/lambda"
-  base_name          = local.base_name
-  lambda_source_file = local.lambda_source_file
+module "lambda_hello" {
+  source             = "./modules/lambda"
+  base_name          = "01-${local.base_name}"
+  lambda_source_file = local.lambda01_source_file
+  lambda_class_name  = "com.roberto.aws.lambda.FunctionHello"
   aws_region         = var.aws_region
   lab_role_arn       = var.lab_role_arn
- }
+}
+
+module "lambda_sqs" {
+  source             = "./modules/lambda"
+  base_name          = "02-${local.base_name}"
+  lambda_source_file = local.lambda02_source_file
+  lambda_class_name  = "com.roberto.aws.lambda.FunctionSQS"
+  aws_region         = var.aws_region
+  lab_role_arn       = var.lab_role_arn
+}
+
+module "sqs" {
+  source                 = "./modules/sqs"
+  base_name              = local.base_name
+  destination_lambda_arn = module.lambda_sqs.lambda_function_arn
+  lab_role_arn           = var.lab_role_arn
+}
+
+# module "api-gateway" {
+#     source               = "./modules/api-gateway"
+#     base_name            = local.base_name
+#     lambda_function_name = module.lambda.lambda_function_name
+# }

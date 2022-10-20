@@ -1,22 +1,22 @@
 locals {
-  lambda_source_file = "${path.module}/../../../app/lambda01/target/lambda01-0.1.jar"
+  lambda_name = "lambda-${var.base_name}"
 }
 
-resource "aws_lambda_function" "lambda_hello_world" {
+resource "aws_lambda_function" "lambda_example" {
   function_name = "lambda-${var.base_name}"
   description   = "My first lambda function :)."
-  handler       = "com.roberto.aws.lambda.FunctionHello"
+  handler       = var.lambda_class_name
   runtime       = "java11"
 
   s3_bucket = aws_s3_bucket.lambda_bucket.id
-  s3_key    = aws_s3_object.s3_object_hello_world.key
+  s3_key    = aws_s3_object.s3_object_lambda.key
 
-  source_code_hash = filebase64sha256(local.lambda_source_file)
+  source_code_hash = filebase64sha256(var.lambda_source_file)
 
   role = var.lab_role_arn != "" ? var.lab_role_arn : aws_iam_role.lambda_exec_role[0].arn
   tags = {
-      Name   = "lambda-${var.base_name}"
-      Type   = "Lambda"
+    Name   = local.lambda_name
+    Type   = "Lambda"
   }
 }
 
@@ -29,15 +29,15 @@ resource "aws_s3_bucket_acl" "bucket_acl" {
   acl    = "private"
 }
 
-resource "aws_s3_object" "s3_object_hello_world" {
+resource "aws_s3_object" "s3_object_lambda" {
   bucket = aws_s3_bucket.lambda_bucket.id
-  key    = "lambda-hello-world.jar"
-  source = local.lambda_source_file
-  etag   = filemd5(local.lambda_source_file)
+  key    = "${local.lambda_name}.jar"
+  source = var.lambda_source_file
+  etag   = filemd5(var.lambda_source_file)
 }
 
-resource "aws_cloudwatch_log_group" "hello_world_lg" {
-  name              = "/aws/lambda/${aws_lambda_function.lambda_hello_world.function_name}"
+resource "aws_cloudwatch_log_group" "lambda_lg" {
+  name              = "/aws/lambda/${aws_lambda_function.lambda_example.function_name}"
   retention_in_days = 30
 }
 
@@ -62,7 +62,7 @@ resource "aws_iam_role" "lambda_exec_role" {
       {
         Effect = "Allow"
         Action = ["s3:GetObject"]
-        Resource = [aws_s3_object.s3_object_hello_world.acl]
+        Resource = [aws_s3_object.s3_object_lambda.acl]
       },
     ]
     })

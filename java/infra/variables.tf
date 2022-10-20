@@ -7,6 +7,6 @@ variable "aws_region" {
 }
 
 variable "lab_role_arn" {
-  description =  "ARN of the role already created to use."
+  description = "ARN of the role already created to use."
   type        = string
 }
