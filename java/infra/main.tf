@@ -73,11 +73,11 @@ module "dlq" {
   lab_role_arn   = var.lab_role_arn
 }
 
-# module "dynamodb" {
-#   source       = "./modules/dynamodb"
-#   base_name    = local.base_name
-#   lab_role_arn = var.lab_role_arn
-# }
+ module "dynamodb" {
+   source       = "./modules/dynamodb"
+   base_name    = local.base_name
+   lab_role_arn = var.lab_role_arn
+ }
 
 # module "api-gateway" {
 #   source               = "./modules/api-gateway"
