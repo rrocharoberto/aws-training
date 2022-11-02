@@ -4,16 +4,11 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>com.roberto.aws</groupId>
-    <artifactId>app</artifactId>
-    <version>0.1</version>
-  </parent>
-
   <groupId>com.roberto.aws</groupId>
-  <artifactId>lambda03</artifactId>
+  <artifactId>app</artifactId>
   <version>0.1</version>
-  <name>lambda03</name>
+  <packaging>pom</packaging>
+  <name>app</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,46 +16,71 @@
     <maven.compiler.target>11</maven.compiler.target>
   </properties>
 
+  <modules>
+    <module>lambda01</module>
+    <module>lambda02</module>
+    <module>lambda03</module>
+    <module>lambda04</module>
+  </modules>
+  <dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-lambda-java-core</artifactId>
+      <version>1.2.1</version>
     </dependency>
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-lambda-java-events</artifactId>
+      <version>3.11.0</version>
     </dependency>
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-sqs</artifactId>
+      <version>1.12.329</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.8.6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
+      <version>[2.17.1,)</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
+      <version>[2.17.1,)</version>
+      <scope>test</scope>
     </dependency>
-    <dependency>
+    <dependency> 
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j18-impl</artifactId>
+      <version>[2.17.1,)</version>
+      <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-       <dependency>
+  <dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-api</artifactId>
+    <version>2.0.3</version>
+  </dependency>
+   <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
+      <version>5.6.0</version>
       <scope>test</scope>
    </dependency>
    <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
+      <version>5.6.0</version>
       <scope>test</scope>
    </dependency>
   </dependencies>
+  </dependencyManagement>
     <build>
         <plugins>
             <plugin>
