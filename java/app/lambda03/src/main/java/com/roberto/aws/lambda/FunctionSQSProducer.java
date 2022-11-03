@@ -13,20 +13,19 @@ import org.slf4j.LoggerFactory;
 public class FunctionSQSProducer implements RequestHandler<String, String> {
 
     private static final Logger logger = LoggerFactory.getLogger(FunctionSQSProducer.class);
-    private static final String QUEUE_NAME = "aws-training-queue";
+    private static final String QUEUE_NAME = "hello-aws-training-queue";
     private AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
 
     @Override
     public String handleRequest(String inMessage, Context context) {
         logger.info("Message received in lambda: " + inMessage);
         logger.info("Sending message to Queue " + QUEUE_NAME);
-
         String queueUrl = sqs.getQueueUrl(QUEUE_NAME).getQueueUrl();
 
         SendMessageRequest sendMsgRequest = new SendMessageRequest()
             .withQueueUrl(queueUrl)
             .withMessageBody("Message from lambda03: " + inMessage)
-            .withDelaySeconds(5);
+            .withDelaySeconds(1);
         SendMessageResult result = sqs.sendMessage(sendMsgRequest);
         logger.info("SendMessageResult " + result.getMessageId());
         return "Success";
