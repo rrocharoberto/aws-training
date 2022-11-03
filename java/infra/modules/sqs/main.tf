@@ -1,17 +1,26 @@
+locals {
+  name = "hello-${var.base_name}"
+  tags = {
+    Environment = "Test"
+    Owner       = "Roberto Rocha"
+    Creator     = "Terraform"
+    Resource    = local.name
+  }
+}
 
-##### Main Queue configuration #####
-#####
 resource "aws_sqs_queue" "sqs_example" {
-  name                      = "sqs-${var.base_name}"
+  name                      = local.name
   delay_seconds             = 10
   max_message_size          = 1024
   message_retention_seconds = 86400
   receive_wait_time_seconds = 10
 
-  tags = {
-    Name   = "lambda-${var.base_name}"
-    Type = "sqs"
-  }
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = var.dead_letter_queue_arn
+    maxReceiveCount     = 2
+  })
+
+  tags = merge(local.tags, { Type = "sqs" })
 }
 
 resource "aws_iam_role" "sqs_role" {

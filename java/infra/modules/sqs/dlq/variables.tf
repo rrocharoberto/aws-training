@@ -10,7 +10,7 @@ variable "lab_role_arn" {
   type        = string
 }
 
-variable "dlq_lambda_arn" {
-  description = "ARN of the DLQ lambda that will receive DQL messages."
+variable "destination_lambda_arn" {
+  description = "ARN of the lambda that will receive messages from DLQ."
   type        = string
 }

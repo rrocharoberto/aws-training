@@ -1,20 +1,23 @@
 locals {
   name = "ddb-table-${var.base_name}"
   tags = {
-    "Terraform" = true
+    Environment = "Test"
+    Owner       = "Roberto Rocha"
+    Creator     = "Terraform"
+    Resource    = local.name
   }
 }
 
 resource "aws_dynamodb_table" "table_example" {
-  name             = local.name
-  billing_mode     = "PAY_PER_REQUEST"
-  hash_key         = "messageId"
+  name         = local.name
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "messageId"
   #range_key        = var.range_key
-#  read_capacity    = 20
-#  write_capacity   = 20
+  #  read_capacity    = 20
+  #  write_capacity   = 20
   #stream_enabled   = var.stream_enabled
   #stream_view_type = var.stream_view_type
-  table_class      = "STANDARD"
+  table_class = "STANDARD"
 
   attribute {
     name = "messageId"
@@ -27,10 +30,11 @@ resource "aws_dynamodb_table" "table_example" {
   }
 
   server_side_encryption {
-    enabled     = true
+    enabled = true
   }
 
-#  lifecycle {ignore_changes = [write_capacity, read_capacity]}
+  #  lifecycle {ignore_changes = [write_capacity, read_capacity]}
 
-  tags = merge(local.tags, {"Name" = local.name})
+  tags = merge(local.tags, { Type = "dynamo"
+  })
 }

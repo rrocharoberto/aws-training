@@ -6,7 +6,12 @@ variable "base_name" {
 }
 
 variable "destination_lambda_arn" {
-  description = "ARN of the lambda function that will send messages to DLQ."
+  description = "ARN of the lambda function that will receive the messages from the queue."
+  type        = string
+}
+
+variable "dead_letter_queue_arn" {
+  description = "ARN of the dead letter queue."
   type        = string
 }
 
