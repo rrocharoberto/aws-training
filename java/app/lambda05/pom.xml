@@ -11,7 +11,7 @@
   </parent>
 
   <groupId>com.roberto.aws</groupId>
-  <artifactId>lambda5</artifactId>
+  <artifactId>lambda05</artifactId>
   <version>0.1</version>
   <name>lambda05</name>
 
@@ -33,18 +33,6 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-reload4j</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.amazonaws</groupId>
-      <artifactId>aws-lambda-java-log4j</artifactId>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
