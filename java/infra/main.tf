@@ -95,9 +95,10 @@ module "dlq" {
 }
 
 module "dynamodb" {
-  source       = "./modules/dynamodb"
-  base_name    = local.base_name
-  lab_role_arn = var.lab_role_arn
+  source                 = "./modules/dynamodb"
+  base_name              = local.base_name
+  destination_lambda_arn = module.lambda_dynamoDB_stream.lambda_function_arn
+  lab_role_arn           = var.lab_role_arn
 }
 
 # module "api-gateway" {

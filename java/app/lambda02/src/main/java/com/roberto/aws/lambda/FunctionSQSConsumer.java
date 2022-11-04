@@ -14,13 +14,13 @@ public class FunctionSQSConsumer implements RequestHandler<SQSEvent, String> {
 
     @Override
     public String handleRequest(SQSEvent event, Context context) {
-        logger.info("Event received in SQS Lambda: " + event);
+        logger.info("Event received: " + event);
         for (SQSMessage msg : event.getRecords()) {
             logger.info("Event body " + new String(msg.getBody()));
 
             // Checks if the message should raise an error -> send to DLQ
             if (msg.getBody().contains("Error")) {
-                logger.info("Raising error. This will send the message to DLQ");
+                logger.info("Raising error. This will send the message to DLQ.");
                 throw new RuntimeException("Invalid message input.");
             }
         }

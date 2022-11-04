@@ -18,7 +18,7 @@ public class FunctionSQSProducer implements RequestHandler<String, String> {
 
     @Override
     public String handleRequest(String inMessage, Context context) {
-        logger.info("Message received in lambda: " + inMessage);
+        logger.info("Message received: " + inMessage);
         logger.info("Sending message to Queue " + QUEUE_NAME);
         String queueUrl = sqs.getQueueUrl(QUEUE_NAME).getQueueUrl();
 

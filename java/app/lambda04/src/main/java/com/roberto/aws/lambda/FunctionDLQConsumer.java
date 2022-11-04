@@ -16,7 +16,7 @@ public class FunctionDLQConsumer implements RequestHandler<SQSEvent, String> {
   public String handleRequest(SQSEvent event, Context context) {
     logger.info("Event received in Lambda: " + event);
     for (SQSMessage msg : event.getRecords()) {
-      logger.info("Processing message:" + msg.getBody());
+      logger.info("Processing message: " + msg.getBody());
     }
     return "SUCCESS";
   }
