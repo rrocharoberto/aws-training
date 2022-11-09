@@ -34,3 +34,6 @@ hs_err_pid*
 #Terraform
 **/.terraform*
 **/.terraform/**
+**/.factorypath
+**/terraform.tfstate*
+java/infra/tfplan

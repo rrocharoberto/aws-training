@@ -1,5 +1,5 @@
 locals {
-  name = "ddb-table-${var.base_name}"
+  name = "${var.base_name}-message"
   tags = {
     Environment = "Test"
     Owner       = "Roberto Rocha"

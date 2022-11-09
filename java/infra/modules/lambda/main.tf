@@ -14,8 +14,8 @@ resource "aws_lambda_function" "lambda_example" {
   description   = "My first lambda function :)."
   handler       = var.lambda_class_name
   runtime       = "java11"
-  timeout       = 10
-  memory_size   = 256
+  timeout       = 15
+  memory_size   = 512
 
   s3_bucket = aws_s3_bucket.lambda_bucket.id
   s3_key    = aws_s3_object.s3_object_lambda.key

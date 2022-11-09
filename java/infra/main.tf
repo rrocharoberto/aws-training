@@ -1,6 +1,7 @@
 locals {
-  base_name  = "aws-training-${random_integer.base_number.id}"
-  queue_name = "aws-training-queue"
+  prefix_name = "aws-training"
+  base_name   = "${local.prefix_name}-${random_integer.base_number.id}"
+  queue_name  = "${local.prefix_name}-queue"
 
   lambda01_source_file = "${path.module}/../app/lambda01/target/lambda01-0.1.jar"
   lambda02_source_file = "${path.module}/../app/lambda02/target/lambda02-0.1.jar"
@@ -96,7 +97,7 @@ module "dlq" {
 
 module "dynamodb" {
   source                 = "./modules/dynamodb"
-  base_name              = local.base_name
+  base_name              = local.prefix_name
   destination_lambda_arn = module.lambda_dynamoDB_stream.lambda_function_arn
   lab_role_arn           = var.lab_role_arn
 }
