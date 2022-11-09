@@ -1,10 +1,5 @@
 # Input variable definitions
 
-variable "aws_region" {
-  description = "AWS region for all resources."
-  type        = string
-}
-
 variable "base_name" {
   description = "Base name to use in the resources name."
   type        = string
@@ -17,6 +12,16 @@ variable "lambda_source_file" {
 
 variable "lambda_class_name" {
   description = "Full name of the lambda class."
+  type        = string
+}
+
+variable "s3_bucket_id" {
+  description = "Id of the S3 bucket."
+  type        = string
+}
+
+variable "s3_bucket_arn" {
+  description = "ARN of the S3 bucket."
   type        = string
 }
 

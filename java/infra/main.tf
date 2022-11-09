@@ -35,48 +35,59 @@ resource "random_integer" "base_number" {
   max = 9999
 }
 
+module "s3_bucket" {
+  source       = "./modules/s3"
+  base_name    = "01-${local.base_name}"
+  lab_role_arn = var.lab_role_arn
+}
+
 module "lambda_hello" {
   source             = "./modules/lambda"
   base_name          = "01-${local.base_name}"
+  s3_bucket_id       = module.s3_bucket.s3_bucket_id
+  s3_bucket_arn      = module.s3_bucket.s3_bucket_arn
   lambda_source_file = local.lambda01_source_file
   lambda_class_name  = local.lambda01_class_name
-  aws_region         = var.aws_region
   lab_role_arn       = var.lab_role_arn
 }
 
 module "lambda_sqs" {
   source             = "./modules/lambda"
   base_name          = "02-${local.base_name}"
+  s3_bucket_id       = module.s3_bucket.s3_bucket_id
+  s3_bucket_arn      = module.s3_bucket.s3_bucket_arn
   lambda_source_file = local.lambda02_source_file
   lambda_class_name  = local.lambda02_class_name
-  aws_region         = var.aws_region
   lab_role_arn       = var.lab_role_arn
 }
 
 module "lambda_event_generator" {
   source             = "./modules/lambda"
   base_name          = "03-${local.base_name}"
+  s3_bucket_id       = module.s3_bucket.s3_bucket_id
+  s3_bucket_arn      = module.s3_bucket.s3_bucket_arn
   lambda_source_file = local.lambda03_source_file
   lambda_class_name  = local.lambda03_class_name
-  aws_region         = var.aws_region
   lab_role_arn       = var.lab_role_arn
 }
 
 module "lambda_dlq" {
   source             = "./modules/lambda"
   base_name          = "04-${local.base_name}"
+  s3_bucket_id       = module.s3_bucket.s3_bucket_id
+  s3_bucket_arn      = module.s3_bucket.s3_bucket_arn
   lambda_source_file = local.lambda04_source_file
   lambda_class_name  = local.lambda04_class_name
-  aws_region         = var.aws_region
   lab_role_arn       = var.lab_role_arn
 }
 
 module "lambda_dynamoDB_stream" {
   source             = "./modules/lambda"
   base_name          = "05-${local.base_name}"
+  s3_bucket_id       = module.s3_bucket.s3_bucket_id
+  s3_bucket_arn      = module.s3_bucket.s3_bucket_arn
   lambda_source_file = local.lambda05_source_file
   lambda_class_name  = local.lambda05_class_name
-  aws_region         = var.aws_region
   lab_role_arn       = var.lab_role_arn
 }
 
