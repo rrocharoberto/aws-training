@@ -51,7 +51,7 @@ module "lambda_hello" {
   lab_role_arn       = var.lab_role_arn
 }
 
-module "lambda_sqs" {
+module "lambda_sqs_consumer" {
   source             = "./modules/lambda"
   base_name          = "02-${local.base_name}"
   s3_bucket_id       = module.s3_bucket.s3_bucket_id
@@ -61,7 +61,7 @@ module "lambda_sqs" {
   lab_role_arn       = var.lab_role_arn
 }
 
-module "lambda_event_generator" {
+module "lambda_sqs_producer" {
   source             = "./modules/lambda"
   base_name          = "03-${local.base_name}"
   s3_bucket_id       = module.s3_bucket.s3_bucket_id
@@ -94,7 +94,7 @@ module "lambda_dynamoDB_stream" {
 module "sqs" {
   source                 = "./modules/sqs"
   base_name              = local.queue_name
-  destination_lambda_arn = module.lambda_sqs.lambda_function_arn
+  destination_lambda_arn = module.lambda_sqs_consumer.lambda_function_arn
   dead_letter_queue_arn  = module.dlq.dead_letter_queue_arn
   lab_role_arn           = var.lab_role_arn
 }
@@ -111,6 +111,12 @@ module "dynamodb" {
   base_name              = local.prefix_name
   destination_lambda_arn = module.lambda_dynamoDB_stream.lambda_function_arn
   lab_role_arn           = var.lab_role_arn
+}
+
+module "lambda02-alarm" {
+  source               = "./modules/alarm"
+  base_name            = local.prefix_name
+  lambda_function_name = module.lambda_sqs_consumer.lambda_function_name
 }
 
 # module "api-gateway" {
