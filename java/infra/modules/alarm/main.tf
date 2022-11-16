@@ -29,6 +29,8 @@ resource "aws_cloudwatch_metric_alarm" "lambda_alarm" {
     FunctionName = var.lambda_function_name
   }
 
+  alarm_actions = [var.sns_arn]
+
   #slack test
   #alarm_actions = [var.sns_slack_arn]
   #ok_actions    = [aws_sns_topic.sns.arn]

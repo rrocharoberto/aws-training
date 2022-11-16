@@ -10,8 +10,8 @@ variable "lambda_function_name" {
   type        = string
 }
 
-variable "sns_slack_arn" {
-  description = "ARN of the slack SNS chanel configuration."
+variable "sns_arn" {
+  description = "ARN of the SNS to send alarm messages."
   type        = string
   default     = ""
 }

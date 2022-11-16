@@ -10,3 +10,8 @@ variable "lab_role_arn" {
   description = "ARN of the role already created to use."
   type        = string
 }
+
+variable "email_recipient" {
+  description = "Email to receive the SNS messages."
+  type        = string
+}
