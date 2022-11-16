@@ -1,0 +1,15 @@
+{
+    "Resources": {
+        "SlackChannelConfiguration": {
+            "Type": "AWS::Chatbot::SlackChannelConfiguration",
+            "Properties": {
+                "ConfigurationName": "${ConfigurationNameParameter}",
+                "IamRoleArn": "${IamRoleArnParameter}",
+                "LoggingLevel": "${LoggingLevelParameter}",
+                "SlackChannelId": "${SlackChannelIdParameter}",
+                "SlackWorkspaceId": "${SlackWorkspaceIdParameter}",
+                "SnsTopicArns": "${SnsTopicArnsParameter}"
+            }
+        }
+    }
+}

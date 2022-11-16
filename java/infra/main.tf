@@ -117,7 +117,14 @@ module "lambda02-alarm" {
   source               = "./modules/alarm"
   base_name            = local.prefix_name
   lambda_function_name = module.lambda_sqs_consumer.lambda_function_name
+#  sns_slack_arn        = module.alarm_slack_sns.sns_slack_arn
 }
+
+#module "alarm_slack_sns" {
+#  source       = "./modules/slack"
+#  base_name    = local.prefix_name
+#  lab_role_arn = var.lab_role_arn
+#}
 
 # module "api-gateway" {
 #   source               = "./modules/api-gateway"

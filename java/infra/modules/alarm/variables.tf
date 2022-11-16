@@ -9,3 +9,9 @@ variable "lambda_function_name" {
   description = "Name of the lambda function."
   type        = string
 }
+
+variable "sns_slack_arn" {
+  description = "ARN of the slack SNS chanel configuration."
+  type        = string
+  default     = ""
+}
