@@ -7,9 +7,8 @@ locals {
     Creator     = "Terraform"
   }
 
-  #Test channel: https://hooks.slack.com/services/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
-  slack_workspace_id = "T04A97TB11T"
-  slack_channel_id   = "B04AM6BSHRC"
+  slack_workspace_id = "<WORKSPACE_ID_TO_FIX>"
+  slack_channel_id   = "<CHANNEL_ID_TO_FIX"
 
   guardrail_policies    = "arn:aws:iam::aws:policy/ReadOnlyAccess"
   chatbot_logging_level = "INFO"
