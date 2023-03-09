@@ -36,4 +36,7 @@ hs_err_pid*
 **/.terraform/**
 **/.factorypath
 **/terraform.tfstate*
-java/infra/tfplan
+**/tfplan
+
+#drawio
+**/*.bkp
