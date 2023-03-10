@@ -35,9 +35,9 @@ resource "aws_lambda_function" "lambda_example_01" {
   description   = "My first lambda function :)."
 
   runtime = "python3.8"
+  timeout = 10
   handler = local.lambda_method_name
   role    = aws_iam_role.lambda_role.arn
-  timeout = 10
 
   s3_bucket = aws_s3_bucket.lambda_bucket.id
   s3_key    = aws_s3_object.s3_object_lambda.key
@@ -68,7 +68,7 @@ resource "aws_cloudwatch_log_group" "lambda_log_group" {
 
 ##### Lambda role #####
 resource "aws_iam_role" "lambda_role" {
-  name               = "lambdaRole-${local.base_name}"
+  name               = "lambdaAssumeRole-${local.base_name}"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
   tags               = local.tags
 }
@@ -83,3 +83,28 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
     }
   }
 }
+
+# Attach the logging policy to the lambda role.
+resource "aws_iam_role_policy_attachment" "lambda_log_policy_attachment" {
+  role       = aws_iam_role.lambda_role.id
+  policy_arn = aws_iam_policy.lambda_log_policy.arn
+}
+
+resource "aws_iam_policy" "lambda_log_policy" {
+  name        = "lambdaLogPolicy-${local.base_name}"
+  description = "Allow appsync execution role access to CloudWatch logs"
+  policy      = data.aws_iam_policy_document.lambda_log_policy_doc.json
+  tags        = local.tags
+}
+
+data "aws_iam_policy_document" "lambda_log_policy_doc" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources = ["arn:aws:logs:*:*:*"]
+  }
+}
+
