@@ -20,8 +20,13 @@ variable "lambda_source_file" {
   type        = string
 }
 
-variable "lambda_class_name" {
-  description = "Full name of the lambda class."
+variable "lambda_handler" {
+  description = "Full name of the lambda handler."
+  type        = string
+}
+
+variable "runtime" {
+  description = "Runtime to run the lambda handler."
   type        = string
 }
 
@@ -30,10 +35,21 @@ variable "lambda_bucket_id" {
   type        = string
 }
 
+variable "s3_object_name" {
+  description = "Name of the S3 object."
+  type        = string
+}
+
 variable "message_table_arn" {
   type        = string
   description = "Arn of the Message table"
-  default     = ""
+  default     = null
+}
+
+variable "env_vars" {
+  description = "A mapping of environment variables the lambda must have"
+  type        = map(string)
+  default     = {}
 }
 
 variable "tags" {

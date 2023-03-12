@@ -1,12 +1,14 @@
 resource "aws_apigatewayv2_api" "api_gw_rest_api" {
   name          = "rest-api-${var.base_name}"
   protocol_type = "HTTP"
+  tags = var.tags
 }
 
 resource "aws_apigatewayv2_stage" "api_gw_stage" {
   name        = var.stage_name
   api_id = aws_apigatewayv2_api.api_gw_rest_api.id
   auto_deploy = true
+  tags = var.tags
 }
 
 #GET
@@ -43,6 +45,7 @@ resource "aws_cloudwatch_log_group" "api_gw_lg" {
   name = "/aws/api_gw/${aws_apigatewayv2_api.api_gw_rest_api.name}"
 
   retention_in_days = 30
+  tags = var.tags
 }
 
 resource "aws_lambda_permission" "api_gw_lambda_permission" {

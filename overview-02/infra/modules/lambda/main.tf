@@ -1,14 +1,18 @@
 locals {
   name = "lambda-${var.base_name}"
   lambda_zip_file = "${var.base_name}.zip"
+  env_vars = {
+    SERVICE     = var.service_name
+    ENVIRONMENT = var.environment
+  }
 }
 
 ##### Lambda resources #####
 resource "aws_lambda_function" "lambda_example" {
   function_name = local.name
   description   = "My first lambda function :)."
-  handler       = var.lambda_class_name
-  runtime       = "java11"
+  handler       = var.lambda_handler
+  runtime       = var.runtime
   timeout       = 15
   memory_size   = 512
 
@@ -16,10 +20,7 @@ resource "aws_lambda_function" "lambda_example" {
   s3_key    = aws_s3_object.s3_object_lambda.key
 
   environment {
-    variables = {
-      SERVICE     = var.service_name
-      ENVIRONMENT = var.environment
-    }
+    variables = var.env_vars == null ? local.env_vars : merge(local.env_vars, var.env_vars)
   }
 
   role    = aws_iam_role.lambda_role.arn
@@ -30,7 +31,7 @@ resource "aws_lambda_function" "lambda_example" {
 
 resource "aws_s3_object" "s3_object_lambda" {
   bucket = var.lambda_bucket_id
-  key    = "${local.name}.jar"
+  key    = var.s3_object_name
   source = var.lambda_source_file
   etag   = filemd5(var.lambda_source_file)
   tags   = var.tags
@@ -85,20 +86,23 @@ data "aws_iam_policy_document" "lambda_log_policy_doc" {
 
 # Attach the logging policy to the lambda role.
 resource "aws_iam_role_policy_attachment" "lambda_dynamo_policy_attachment" {
+  count       = var.message_table_arn == null ? 0 : 1
   role       = aws_iam_role.lambda_role.id
-  policy_arn = aws_iam_policy.lambda_dynamo_policy.arn
+  policy_arn = aws_iam_policy.lambda_dynamo_policy[0].arn
 }
 
 resource "aws_iam_policy" "lambda_dynamo_policy" {
+  count       = var.message_table_arn == null ? 0 : 1
   name        = "lambdaDynamoDBPolicy-${var.base_name}"
   description = "Allow lambda execution role access DynamoDB table"
   policy      = data.aws_iam_policy_document.lambda_dynamodb_policy_doc.json
   tags        = var.tags
 }
 
-
 data "aws_iam_policy_document" "lambda_dynamodb_policy_doc" {
   statement {
+    effect    = "Allow"
+    resources = compact([var.message_table_arn, format("%s/index/*", var.message_table_arn)])
     actions = [
       "dynamodb:BatchWriteItem",
       "dynamodb:PutItem",
@@ -111,7 +115,5 @@ data "aws_iam_policy_document" "lambda_dynamodb_policy_doc" {
       "dynamodb:Query",
       "dynamodb:Scan"
     ]
-    effect    = "Allow"
-    resources = compact([var.message_table_arn, format("%s/index/*", var.message_table_arn)])
   }
 }
