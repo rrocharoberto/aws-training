@@ -9,7 +9,7 @@ locals {
 }
 
 resource "aws_s3_bucket" "lambda_bucket" {
-  bucket = "bucket-${var.base_name}"
+  bucket = local.name
   tags   = merge(local.tags, { Type = "Bucket" })
 }
 
