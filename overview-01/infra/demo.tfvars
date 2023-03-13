@@ -1,2 +1,2 @@
 service_name = "aws-training"
-environment  = "demo"
+environment  = "demo01"

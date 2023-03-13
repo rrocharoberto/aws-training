@@ -1,14 +1,14 @@
 resource "aws_apigatewayv2_api" "api_gw_rest_api" {
   name          = "rest-api-${var.base_name}"
   protocol_type = "HTTP"
-  tags = var.tags
+  tags          = var.tags
 }
 
 resource "aws_apigatewayv2_stage" "api_gw_stage" {
   name        = var.stage_name
-  api_id = aws_apigatewayv2_api.api_gw_rest_api.id
+  api_id      = aws_apigatewayv2_api.api_gw_rest_api.id
   auto_deploy = true
-  tags = var.tags
+  tags        = var.tags
 }
 
 #GET
@@ -21,7 +21,7 @@ resource "aws_apigatewayv2_integration" "api_gw_integration_get" {
 }
 
 resource "aws_apigatewayv2_route" "get_route_get" {
-  api_id = aws_apigatewayv2_api.api_gw_rest_api.id
+  api_id    = aws_apigatewayv2_api.api_gw_rest_api.id
   route_key = "GET ${var.resource_url}"
   target    = "integrations/${aws_apigatewayv2_integration.api_gw_integration_get.id}"
 }
@@ -36,7 +36,7 @@ resource "aws_apigatewayv2_integration" "api_gw_integration_post" {
 }
 
 resource "aws_apigatewayv2_route" "get_route_post" {
-  api_id = aws_apigatewayv2_api.api_gw_rest_api.id
+  api_id    = aws_apigatewayv2_api.api_gw_rest_api.id
   route_key = "POST ${var.resource_url}"
   target    = "integrations/${aws_apigatewayv2_integration.api_gw_integration_post.id}"
 }
@@ -45,7 +45,7 @@ resource "aws_cloudwatch_log_group" "api_gw_lg" {
   name = "/aws/api_gw/${aws_apigatewayv2_api.api_gw_rest_api.name}"
 
   retention_in_days = 30
-  tags = var.tags
+  tags              = var.tags
 }
 
 resource "aws_lambda_permission" "api_gw_lambda_permission" {

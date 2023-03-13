@@ -2,12 +2,12 @@ locals {
   prefix_name = "aws-training"
   base_name   = "${local.prefix_name}-${random_integer.base_number.id}"
 
-  lambda02_source_file = "${path.module}/../app/lambda-02/target/lambda-02-0.1.jar"
-  lambda02_handler = "com.roberto.aws.lambda.MessageController"
-  lambda02_jar = "lambda-02.jar"
+  lambda02_source_file = "${path.module}/../../app/lambda-02/target/lambda-02-0.1.jar"
+  lambda02_handler     = "com.roberto.aws.lambda.MessageController"
+  lambda02_jar         = "lambda-02.jar"
 
-  lambda03_source_file = "${path.module}/../app/lambda-01/lambda_function.py"
-  lambda03_handler = "lambda_function.lambda_handler"
+  lambda03_source_file = "${path.module}/../../app/lambda-03/lambda_slack.py"
+  lambda03_handler     = "lambda_function.lambda_handler"
   lambda03_zip         = "lambda-03.zip"
 
   tags = {
@@ -36,8 +36,7 @@ module "lambda_dynamoDB" {
   lambda_handler     = local.lambda02_handler
   s3_object_name     = local.lambda02_jar
 
-  message_table_arn = module.dynamodb.dynamodb_table_arn
-  tags              = local.tags
+  tags = local.tags
 }
 
 data "archive_file" "python_lambda_package" {
@@ -47,10 +46,10 @@ data "archive_file" "python_lambda_package" {
 }
 
 module "lambda_slack" {
-  source    = "../modules/lambda"
-  base_name = "03-${local.base_name}"
-  lambda_handler     = local.lambda03_handler
-  runtime = "python3.8"
+  source         = "../modules/lambda"
+  base_name      = "03-${local.base_name}"
+  lambda_handler = local.lambda03_handler
+  runtime        = "python3.8"
 
   service_name = var.service_name
   environment  = var.environment
@@ -64,7 +63,15 @@ module "lambda_slack" {
     SLACK_HOOK_URL = var.slack_hook_url
     SLACK_CHANNEL  = "#aws-messages"
   }
-  tags              = local.tags
+  tags = local.tags
+}
+
+module "lambda_dynamo_attachment" {
+  source           = "../modules/lambda/dynamo-policy"
+  base_name        = "03-${local.base_name}"
+  lambda_role_id   = module.lambda_dynamoDB.lambda_role_id
+  dynamo_table_arn = module.dynamodb.dynamodb_table_arn
+  tags             = local.tags
 }
 
 module "dynamodb" {
@@ -73,7 +80,7 @@ module "dynamodb" {
   tags      = local.tags
 }
 
-module "api-gateway" {
+module "api_gateway" {
   source       = "../modules/api-gateway"
   base_name    = local.base_name
   resource_url = "/message"
@@ -81,16 +88,16 @@ module "api-gateway" {
 
   lambda_function_name = module.lambda_dynamoDB.lambda_function_name
   lambda_function_arn  = module.lambda_dynamoDB.lambda_function_arn
-  tags      = local.tags
+  tags                 = local.tags
 }
 
 module "sns_slack" {
-  source          = "../modules/sns"
-  base_name       = "sns-slack-${local.base_name}"
-  lambda_function_arn  = module.lambda_dynamoDB.lambda_function_arn
+  source              = "../modules/sns"
+  base_name           = "sns-slack-${local.base_name}"
+  lambda_function_arn = module.lambda_dynamoDB.lambda_function_arn
 }
 
-module "lambda02-alarm" {
+module "alarm_lambda02" {
   source               = "../modules/alarm"
   base_name            = "alarm-lambda02-${local.base_name}"
   lambda_function_name = module.lambda_dynamoDB.lambda_function_name

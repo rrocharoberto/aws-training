@@ -40,12 +40,6 @@ variable "s3_object_name" {
   type        = string
 }
 
-variable "message_table_arn" {
-  type        = string
-  description = "Arn of the Message table"
-  default     = null
-}
-
 variable "env_vars" {
   description = "A mapping of environment variables the lambda must have"
   type        = map(string)

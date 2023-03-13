@@ -2,7 +2,7 @@ import boto3
 import os
 
 def lambda_handler(event, context):
-    print("Running lambda with input data: " + str(event))
+    print("Running lambda. Input data: " + str(event))
     print("Environment: " + os.environ["ENVIRONMENT"])
     print("Service: " + os.environ["SERVICE"])
     if "error" in event:

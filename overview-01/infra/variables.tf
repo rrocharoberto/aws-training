@@ -11,7 +11,6 @@ variable "service_name" {
   type        = string
 }
 
-
 variable "environment" {
   description = "Environment of deployment."
   type        = string

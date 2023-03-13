@@ -9,3 +9,8 @@ output "lambda_function_arn" {
   description = "ARN of the lambda function."
   value       = aws_lambda_function.lambda_example.arn
 }
+
+output "lambda_role_id" {
+  description = "Id of the lambda role."
+  value       = aws_iam_role.lambda_role.id
+}

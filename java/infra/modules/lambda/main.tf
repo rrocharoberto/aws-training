@@ -19,11 +19,11 @@ resource "aws_lambda_function" "lambda_example" {
   s3_bucket = var.s3_bucket_id
   s3_key    = aws_s3_object.s3_object_lambda.key
 
-  source_code_hash = filebase64sha256(var.lambda_source_file)
 
   role = var.lab_role_arn != "" ? var.lab_role_arn : aws_iam_role.lambda_exec_role[0].arn
 
-  tags = merge(local.tags, { Type = "Lambda" })
+  source_code_hash = filebase64sha256(var.lambda_source_file)
+  tags             = merge(local.tags, { Type = "Lambda" })
 }
 
 resource "aws_s3_object" "s3_object_lambda" {
@@ -31,9 +31,10 @@ resource "aws_s3_object" "s3_object_lambda" {
   key    = "${local.name}.jar"
   source = var.lambda_source_file
   etag   = filemd5(var.lambda_source_file)
+  tags   = local.tags
 }
 
-resource "aws_cloudwatch_log_group" "lambda_lg" {
+resource "aws_cloudwatch_log_group" "lambda_log_group" {
   name              = "/aws/lambda/${aws_lambda_function.lambda_example.function_name}"
   retention_in_days = 14
 }
