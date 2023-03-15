@@ -10,6 +10,11 @@ variable "lambda_function_arn" {
   type        = string
 }
 
+variable "lambda_function_name" {
+  description = "Name of the lambda function associated with the API Gateway."
+  type        = string
+}
+
 variable "tags" {
   description = "A mapping of default tags to assign to the resources"
   type        = map(string)

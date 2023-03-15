@@ -7,7 +7,7 @@ locals {
   lambda02_jar         = "lambda-02.jar"
 
   lambda03_source_file = "${path.module}/../../app/lambda-03/lambda_slack.py"
-  lambda03_handler     = "lambda_function.lambda_handler"
+  lambda03_handler     = "lambda_slack.lambda_handler"
   lambda03_zip         = "lambda-03.zip"
 
   tags = {
@@ -91,15 +91,16 @@ module "api_gateway" {
   tags                 = local.tags
 }
 
-module "sns_slack" {
-  source              = "../modules/sns"
-  base_name           = "sns-slack-${local.base_name}"
-  lambda_function_arn = module.lambda_dynamoDB.lambda_function_arn
-}
-
 module "alarm_lambda02" {
   source               = "../modules/alarm"
-  base_name            = "alarm-lambda02-${local.base_name}"
+  base_name            = "lambda02-${local.base_name}"
   lambda_function_name = module.lambda_dynamoDB.lambda_function_name
   sns_arn              = module.sns_slack.sns_topic_arn
+}
+
+module "sns_slack" {
+  source               = "../modules/sns"
+  base_name            = "slack-${local.base_name}"
+  lambda_function_arn  = module.lambda_slack.lambda_function_arn
+  lambda_function_name = module.lambda_slack.lambda_function_name
 }
