@@ -1,5 +1,7 @@
+locals {
+  name = "alarm-${var.base_name}"
+}
 # API Gateway Alarms
-
 resource "aws_cloudwatch_metric_alarm" "post_4xx_alarm" {
   alarm_name        = "4xx-${local.name}"
   alarm_description = "Alarm for API Gateway POST 4xx errors."
@@ -18,10 +20,10 @@ resource "aws_cloudwatch_metric_alarm" "post_4xx_alarm" {
   treat_missing_data  = "notBreaching"
 
   dimensions = {
-    Resource = var.resource_url
+    Resource = "/${var.resource_name}"
     Method   = "POST"
     Stage    = var.stage_name
-    ApiName  = local.name
+    ApiName  = var.api_name
   }
 
   #slack integration
@@ -49,12 +51,13 @@ resource "aws_cloudwatch_metric_alarm" "post_5xx_alarm" {
   treat_missing_data  = "notBreaching"
 
   dimensions = {
-    Resource = var.resource_url
+    Resource = "/${var.resource_name}"
     Method   = "POST"
     Stage    = var.stage_name
-    ApiName  = local.name
+    ApiName  = var.api_name
   }
 
+  #slack integration
   alarm_actions = [var.sns_arn]
   ok_actions    = [var.sns_arn]
 

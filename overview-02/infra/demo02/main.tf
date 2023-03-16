@@ -51,12 +51,12 @@ module "dynamodb" {
 }
 
 module "api_gateway" {
-  source       = "../modules/api-gateway"
-  base_name    = local.base_name
-  resource_url = "/message"
-  stage_name   = "stage-${var.service_name}-${var.environment}"
+  source        = "../modules/api-gateway"
+  base_name     = local.base_name
+  resource_name = "message"
+  stage_name    = "stage-${var.service_name}-${var.environment}"
 
-  lambda_function_name = module.lambda_dynamoDB.lambda_function_name
-  lambda_function_arn  = module.lambda_dynamoDB.lambda_function_arn
-  tags                 = local.tags
+  lambda_function_name       = module.lambda_dynamoDB.lambda_function_name
+  lambda_function_invoke_arn = module.lambda_dynamoDB.lambda_function_invoke_arn
+  tags                       = local.tags
 }

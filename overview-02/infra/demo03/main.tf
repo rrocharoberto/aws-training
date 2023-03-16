@@ -81,14 +81,14 @@ module "dynamodb" {
 }
 
 module "api_gateway" {
-  source       = "../modules/api-gateway"
-  base_name    = local.base_name
-  resource_url = "/message"
-  stage_name   = "stage-${var.service_name}-${var.environment}"
+  source        = "../modules/api-gateway"
+  base_name     = local.base_name
+  resource_name = "message"
+  stage_name    = "stage-${var.service_name}-${var.environment}"
 
-  lambda_function_name = module.lambda_dynamoDB.lambda_function_name
-  lambda_function_arn  = module.lambda_dynamoDB.lambda_function_arn
-  tags                 = local.tags
+  lambda_function_name       = module.lambda_dynamoDB.lambda_function_name
+  lambda_function_invoke_arn = module.lambda_dynamoDB.lambda_function_invoke_arn
+  tags                       = local.tags
 }
 
 module "alarm_lambda02" {
@@ -96,6 +96,15 @@ module "alarm_lambda02" {
   base_name            = "lambda02-${local.base_name}"
   lambda_function_name = module.lambda_dynamoDB.lambda_function_name
   sns_arn              = module.sns_slack.sns_topic_arn
+}
+
+module "alarms_api_gateway" {
+  source        = "../modules/api-gateway/alarm"
+  base_name     = local.base_name
+  resource_name = "message"
+  api_name      = module.api_gateway.api_name
+  stage_name    = "stage-${var.service_name}-${var.environment}"
+  sns_arn       = module.sns_slack.sns_topic_arn
 }
 
 module "sns_slack" {

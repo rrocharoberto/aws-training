@@ -67,7 +67,7 @@ resource "aws_iam_role_policy_attachment" "lambda_log_policy_attachment" {
 }
 
 resource "aws_iam_policy" "lambda_log_policy" {
-  name        = "lambdaLogPolicy-${var.base_name}"
+  name        = "lambda-log-policy-${var.base_name}"
   description = "Allow lambda execution role access to CloudWatch logs"
   policy      = data.aws_iam_policy_document.lambda_log_policy_doc.json
   tags        = var.tags

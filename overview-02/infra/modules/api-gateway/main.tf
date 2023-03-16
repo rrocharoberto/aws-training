@@ -1,75 +1,96 @@
 locals {
   name = "rest-api-${var.base_name}"
+  redeployment_trigger = md5(format("%s%s%s",
+    file("${path.module}/main.tf"),
+    var.resource_name,
+    var.lambda_function_invoke_arn
+    )
+  )
 }
 
-resource "aws_apigatewayv2_api" "api_gateway_rest_api" {
-  name          = local.name
-  protocol_type = "HTTP"
+resource "aws_api_gateway_rest_api" "api_gateway_rest_api" {
+  name = local.name
+  tags = var.tags
+}
+
+resource "aws_api_gateway_stage" "api_stage" {
+  stage_name    = var.stage_name
+  rest_api_id   = aws_api_gateway_rest_api.api_gateway_rest_api.id
+  deployment_id = aws_api_gateway_deployment.api_deployment.id
+  depends_on    = [aws_cloudwatch_log_group.api_log_group]
   tags          = var.tags
 }
 
-resource "aws_apigatewayv2_stage" "api_gw_stage" {
-  name        = var.stage_name
-  api_id      = aws_apigatewayv2_api.api_gateway_rest_api.id
-  auto_deploy = true
-  tags        = var.tags
-}
-
-resource "aws_apigatewayv2_deployment" "api_gw_deployment" {
-  api_id      = aws_apigatewayv2_api.api_gateway_rest_api.id
+resource "aws_api_gateway_deployment" "api_deployment" {
+  rest_api_id = aws_api_gateway_rest_api.api_gateway_rest_api.id
   description = "API Gateway deployment"
+  triggers = {
+    redeployment = local.redeployment_trigger
+  }
 
   lifecycle {
     create_before_destroy = true
   }
   depends_on = [
-    aws_apigatewayv2_integration.api_gw_integration_get,
-    aws_apigatewayv2_integration.api_gw_integration_post
+    aws_api_gateway_integration.api_integration_get,
+    aws_api_gateway_integration.api_integration_post
   ]
 }
 
-#GET
-resource "aws_apigatewayv2_integration" "api_gw_integration_get" {
-  api_id = aws_apigatewayv2_api.api_gateway_rest_api.id
-
-  integration_uri    = var.lambda_function_arn
-  integration_type   = "AWS_PROXY"
-  integration_method = "GET"
+#RESOURCE
+resource "aws_api_gateway_resource" "resource" {
+  rest_api_id = aws_api_gateway_rest_api.api_gateway_rest_api.id
+  parent_id   = aws_api_gateway_rest_api.api_gateway_rest_api.root_resource_id
+  path_part   = var.resource_name
 }
 
-resource "aws_apigatewayv2_route" "get_route_get" {
-  api_id    = aws_apigatewayv2_api.api_gateway_rest_api.id
-  route_key = "GET ${var.resource_url}"
-  target    = "integrations/${aws_apigatewayv2_integration.api_gw_integration_get.id}"
+#GET
+resource "aws_api_gateway_method" "api_method_get" {
+  rest_api_id   = aws_api_gateway_rest_api.api_gateway_rest_api.id
+  resource_id   = aws_api_gateway_resource.resource.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "api_integration_get" {
+  rest_api_id             = aws_api_gateway_rest_api.api_gateway_rest_api.id
+  resource_id             = aws_api_gateway_resource.resource.id
+  http_method             = aws_api_gateway_method.api_method_get.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST" #API Gateway --> Lambda
+  uri                     = var.lambda_function_invoke_arn
 }
 
 #POST
-resource "aws_apigatewayv2_integration" "api_gw_integration_post" {
-  api_id = aws_apigatewayv2_api.api_gateway_rest_api.id
-
-  integration_uri    = var.lambda_function_arn
-  integration_type   = "AWS_PROXY"
-  integration_method = "POST"
+resource "aws_api_gateway_method" "api_method_post" {
+  rest_api_id   = aws_api_gateway_rest_api.api_gateway_rest_api.id
+  resource_id   = aws_api_gateway_resource.resource.id
+  http_method   = "POST"
+  authorization = "NONE"
 }
 
-resource "aws_apigatewayv2_route" "get_route_post" {
-  api_id    = aws_apigatewayv2_api.api_gateway_rest_api.id
-  route_key = "POST ${var.resource_url}"
-  target    = "integrations/${aws_apigatewayv2_integration.api_gw_integration_post.id}"
+resource "aws_api_gateway_integration" "api_integration_post" {
+  rest_api_id             = aws_api_gateway_rest_api.api_gateway_rest_api.id
+  resource_id             = aws_api_gateway_resource.resource.id
+  http_method             = aws_api_gateway_method.api_method_post.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = var.lambda_function_invoke_arn
 }
 
-resource "aws_cloudwatch_log_group" "api_gw_lg" {
-  name = "/aws/api_gw/${aws_apigatewayv2_api.api_gateway_rest_api.name}"
+#LOG GROUP
+resource "aws_cloudwatch_log_group" "api_log_group" {
+  name = "/aws/api_gw/${aws_api_gateway_rest_api.api_gateway_rest_api.name}"
 
   retention_in_days = 30
   tags              = var.tags
 }
 
-resource "aws_lambda_permission" "api_gw_lambda_permission" {
+#LAMBDA PERMISSION
+resource "aws_lambda_permission" "api_lambda_permission" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = var.lambda_function_name
   principal     = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_apigatewayv2_api.api_gateway_rest_api.execution_arn}/*/*"
+  source_arn    = "${aws_api_gateway_rest_api.api_gateway_rest_api.execution_arn}/*/*"
 }
