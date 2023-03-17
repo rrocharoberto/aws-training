@@ -34,6 +34,7 @@ resource "aws_cloudwatch_metric_alarm" "post_4xx_alarm" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "post_5xx_alarm" {
+  count             = 0 #does not create it now to avoid duplicate alarm with lambda alarm
   alarm_name        = "5xx-${local.name}"
   alarm_description = "Alarm for API Gateway POST 5xx errors."
 
@@ -51,10 +52,8 @@ resource "aws_cloudwatch_metric_alarm" "post_5xx_alarm" {
   treat_missing_data  = "notBreaching"
 
   dimensions = {
-    Resource = "/${var.resource_name}"
-    Method   = "POST"
-    Stage    = var.stage_name
-    ApiName  = var.api_name
+    Stage   = var.stage_name
+    ApiName = var.api_name
   }
 
   #slack integration

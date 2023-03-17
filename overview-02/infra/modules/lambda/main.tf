@@ -33,7 +33,7 @@ resource "aws_s3_object" "s3_object_lambda" {
   bucket = var.lambda_bucket_id
   key    = var.s3_object_name
   source = var.lambda_source_file
-  etag   = filemd5(var.lambda_source_file)
+  etag   = filebase64sha256(var.lambda_source_file)
   tags   = var.tags
 }
 

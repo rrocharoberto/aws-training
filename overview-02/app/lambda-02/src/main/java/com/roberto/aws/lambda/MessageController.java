@@ -50,7 +50,9 @@ public class MessageController implements RequestHandler<APIGatewayProxyRequestE
       }
   } catch(Exception e) {
       logger.error("Error processing request: ", e);
-      throw new RuntimeException("Error processing request");
+      //throw new RuntimeException("Invalid input format.");
+      result = "Invalid input format.";
+      statusCode = 400;
     }
     return prepareResponse(result, statusCode);
   }

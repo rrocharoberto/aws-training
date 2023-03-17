@@ -1,0 +1,16 @@
+${jsonencode({
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "ErrorOutput",
+  "description": "ErrorOutput model that encapsulates single instance of an error object returned.",
+  "properties": {
+    "errorMessage": {
+      "type": "string",
+      "description": "Exception message."
+    },
+    "ref": {
+      "type": "string",
+      "description": "Lambda request id."
+    }
+  }
+})}
