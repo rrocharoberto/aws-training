@@ -40,6 +40,7 @@ resource "aws_s3_object" "s3_object_lambda" {
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
   name              = "/aws/lambda/${aws_lambda_function.lambda_example.function_name}"
   retention_in_days = 14
+  tags              = var.tags
 }
 
 ##### Lambda role #####
