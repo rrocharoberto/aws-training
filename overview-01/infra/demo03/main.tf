@@ -1,5 +1,5 @@
 locals {
-  base_name   = "${var.environment}-${var.service_name}-${random_integer.base_number.id}"
+  base_name = "${var.environment}-${var.service_name}-${random_integer.base_number.id}"
 
   lambda02_source_file = "${path.module}/../../app/lambda-02/target/lambda-02-0.1.jar"
   lambda02_handler     = "com.roberto.aws.lambda.MessageController"
@@ -40,7 +40,7 @@ module "lambda_dynamoDB" {
   env_vars = {
     MESSAGE_DYNAMODB_TABLE_NAME = local.message_table_name
   }
-  
+
   tags = local.tags
 }
 
@@ -66,7 +66,7 @@ module "lambda_slack" {
   env_vars = {
     #export TF_VAR_slack_hook_url=<your_slack_hook_url_here>
     SLACK_HOOK_URL = var.slack_hook_url
-    SLACK_CHANNEL  = "#aws-messages"
+    SLACK_CHANNEL  = var.slack_channel
   }
 
   tags = local.tags

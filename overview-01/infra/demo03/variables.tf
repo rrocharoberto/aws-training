@@ -21,3 +21,8 @@ variable "slack_hook_url" {
   description = "URl of Slack hook which will receive the SNS messages."
   type        = string
 }
+
+variable "slack_channel" {
+  description = "Name of Slack channel which will receive the SNS messages."
+  type        = string
+}

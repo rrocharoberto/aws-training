@@ -1,5 +1,5 @@
 locals {
-  base_name   = "${var.environment}-${var.service_name}-${random_integer.base_number.id}"
+  base_name = "${var.environment}-${var.service_name}-${random_integer.base_number.id}"
 
   lambda02_source_file = "${path.module}/../../app/lambda-02/target/lambda-02-0.1.jar"
   lambda02_handler     = "com.roberto.aws.lambda.MessageController"
