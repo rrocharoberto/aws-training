@@ -9,7 +9,8 @@ import com.roberto.aws.lambda.MessageDTO;
 
 public class MessageService {
 
-    private MessageRepository repo = new MessageRepository();
+    private String dynamoDBTableName = System.getenv("MESSAGE_DYNAMODB_TABLE_NAME");
+    private MessageRepository repo = new MessageRepository(dynamoDBTableName);
 
     public String saveMessage(MessageDTO msg) {
         MessageEntity message = new MessageEntity(Long.toString(System.currentTimeMillis()), msg.getMessageText());

@@ -15,8 +15,12 @@ import org.slf4j.LoggerFactory;
 public class MessageRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(MessageRepository.class);
-    private String DYNAMODB_TABLE_NAME = "aws-training-message";
-    DynamoDBMapper ddbMapper = RepositoryUtil.initDynamoDbClient(DYNAMODB_TABLE_NAME);
+    DynamoDBMapper ddbMapper;
+
+    public MessageRepository(String messageDynamoTableName) {
+        logger.info("Message DynamoDB table name: {}", messageDynamoTableName);
+        ddbMapper = RepositoryUtil.initDynamoDbClient(messageDynamoTableName);
+    }
 
     public void saveMessage(MessageEntity message) {
 

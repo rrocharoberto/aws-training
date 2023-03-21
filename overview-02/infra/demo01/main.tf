@@ -1,7 +1,7 @@
 locals {
-  base_name = "${var.service_name}-${random_integer.base_number.id}"
+  base_name = "${var.environment}-${var.service_name}-${random_integer.base_number.id}"
 
-  lambda_source_file = "${path.module}/../app/lambda-01/lambda_function.py"
+  lambda_source_file = "${path.module}/../../app/lambda-01/lambda_function.py"
   lambda_method_name = "lambda_function.lambda_handler"
   lambda_zip_file    = "${local.base_name}.zip"
 
@@ -31,7 +31,7 @@ data "archive_file" "python_lambda_package" {
 }
 
 resource "aws_lambda_function" "lambda_example_01" {
-  function_name = local.base_name
+  function_name = "lambda-01-${local.base_name}"
   description   = "My first lambda function :)."
 
   runtime = "python3.8"

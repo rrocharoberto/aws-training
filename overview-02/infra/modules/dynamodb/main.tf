@@ -1,9 +1,5 @@
-locals {
-  name = "${var.base_name}-message"
-}
-
 resource "aws_dynamodb_table" "table_message" {
-  name         = local.name
+  name         = var.table_name
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "messageId"
   #range_key        = "messageCategory"

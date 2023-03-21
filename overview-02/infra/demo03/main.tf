@@ -1,6 +1,5 @@
 locals {
-  prefix_name = "aws-training"
-  base_name   = "${local.prefix_name}-${random_integer.base_number.id}"
+  base_name   = "${var.environment}-${var.service_name}-${random_integer.base_number.id}"
 
   lambda02_source_file = "${path.module}/../../app/lambda-02/target/lambda-02-0.1.jar"
   lambda02_handler     = "com.roberto.aws.lambda.MessageController"
@@ -10,8 +9,10 @@ locals {
   lambda03_handler     = "lambda_slack.lambda_handler"
   lambda03_zip         = "lambda-03.zip"
 
+  message_table_name = "${var.environment}-message-table"
+
   tags = {
-    Environment = "Demo"
+    Environment = var.environment
     Owner       = "Roberto Rocha"
     Creator     = "Terraform"
   }
@@ -36,6 +37,10 @@ module "lambda_dynamoDB" {
   lambda_handler     = local.lambda02_handler
   s3_object_name     = local.lambda02_jar
 
+  env_vars = {
+    MESSAGE_DYNAMODB_TABLE_NAME = local.message_table_name
+  }
+  
   tags = local.tags
 }
 
@@ -63,21 +68,23 @@ module "lambda_slack" {
     SLACK_HOOK_URL = var.slack_hook_url
     SLACK_CHANNEL  = "#aws-messages"
   }
+
   tags = local.tags
 }
 
 module "lambda_dynamo_attachment" {
   source           = "../modules/lambda/dynamo-policy"
-  base_name        = "03-${local.base_name}"
+  base_name        = "02-${local.base_name}"
   lambda_role_id   = module.lambda_dynamoDB.lambda_role_id
   dynamo_table_arn = module.dynamodb.dynamodb_table_arn
   tags             = local.tags
 }
 
 module "dynamodb" {
-  source    = "../modules/dynamodb"
-  base_name = local.prefix_name
-  tags      = local.tags
+  source     = "../modules/dynamodb"
+  base_name  = var.service_name
+  table_name = local.message_table_name
+  tags       = local.tags
 }
 
 module "api_gateway" {

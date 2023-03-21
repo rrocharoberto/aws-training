@@ -10,7 +10,7 @@ locals {
 ##### Lambda resources #####
 resource "aws_lambda_function" "lambda_example" {
   function_name = local.name
-  description   = "My first lambda function :)."
+  description   = "Lambda function for demo."
   handler       = var.lambda_handler
   runtime       = var.runtime
   timeout       = 15
