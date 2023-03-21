@@ -91,7 +91,7 @@ resource "aws_iam_role_policy_attachment" "lambda_log_policy_attachment" {
 }
 
 resource "aws_iam_policy" "lambda_log_policy" {
-  name        = "lambda-log-policy-${local.base_name}"
+  name        = "lambda-log-policy-01-${local.base_name}"
   description = "Allow appsync execution role access to CloudWatch logs"
   policy      = data.aws_iam_policy_document.lambda_log_policy_doc.json
   tags        = local.tags

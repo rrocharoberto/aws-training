@@ -16,7 +16,7 @@ locals {
 
 module "s3_bucket_lambdas" {
   source    = "../modules/s3"
-  base_name = "02-${local.base_name}"
+  base_name = local.base_name
   tags      = local.tags
 }
 
