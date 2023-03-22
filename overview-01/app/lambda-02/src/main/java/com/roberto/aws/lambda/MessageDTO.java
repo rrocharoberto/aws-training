@@ -1,13 +1,13 @@
 package com.roberto.aws.lambda;
 
 public class MessageDTO {
-    private String messageText;
+    private String text;
 
-    public MessageDTO(String message) {
-        this.messageText = message;
+    public MessageDTO(String text) {
+        this.text = text;
     }
     
-    public String getMessageText() {
-        return messageText;
+    public String getText() {
+        return text;
     }
 }

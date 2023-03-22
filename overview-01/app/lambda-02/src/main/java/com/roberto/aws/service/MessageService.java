@@ -13,7 +13,7 @@ public class MessageService {
     private MessageRepository repo = new MessageRepository(dynamoDBTableName);
 
     public String saveMessage(MessageDTO msg) {
-        MessageEntity message = new MessageEntity(Long.toString(System.currentTimeMillis()), msg.getMessageText());
+        MessageEntity message = new MessageEntity(Long.toString(System.currentTimeMillis()), msg.getText());
         repo.saveMessage(message);
         return "Save success.";
     }

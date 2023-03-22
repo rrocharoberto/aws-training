@@ -37,7 +37,7 @@ public class MessageController implements RequestHandler<APIGatewayProxyRequestE
           break;
         case "POST":
           MessageDTO bodyInput = gson.fromJson(input.getBody(), MessageDTO.class);
-          if(StringUtils.isNullOrEmpty(bodyInput.getMessageText())) {
+          if(StringUtils.isNullOrEmpty(bodyInput.getText())) {
             statusCode = 400;
             result = "Missing required field.";
           } else {
