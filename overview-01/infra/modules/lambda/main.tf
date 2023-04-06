@@ -1,6 +1,5 @@
 locals {
-  name            = "lambda-${var.base_name}"
-  lambda_zip_file = "${var.base_name}.zip"
+  name = "lambda-${var.base_name}"
   env_vars = {
     SERVICE     = var.service_name
     ENVIRONMENT = var.environment
@@ -45,7 +44,7 @@ resource "aws_cloudwatch_log_group" "lambda_log_group" {
 
 ##### Lambda role #####
 resource "aws_iam_role" "lambda_role" {
-  name               = "lambdaAssumeRole-${var.base_name}"
+  name               = "lambda-assumeRole-${var.base_name}"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
   tags               = var.tags
 }

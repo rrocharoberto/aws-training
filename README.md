@@ -42,7 +42,7 @@ PS: the configuration of `overview-02/infra` is still working in progress.
 
 PS: for `overview-02/infra`, use the following plan command:
 
-- `terraform plan -out=tfplan -var email_recipient=<YOUR_EMAIL>`
+- `terraform plan -var-file=demo.tfvars -out=tfplan -var email_recipient=<YOUR_EMAIL>`
 
 ### Deploy Notes
 
