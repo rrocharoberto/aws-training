@@ -1,11 +1,5 @@
 locals {
-  name = "hello-${var.base_name}"
-  tags = {
-    Environment = "Test"
-    Owner       = "Roberto Rocha"
-    Creator     = "Terraform"
-    Resource    = local.name
-  }
+  name = "sqs-${var.base_name}"
 }
 
 resource "aws_sqs_queue" "sqs_example" {
@@ -20,13 +14,12 @@ resource "aws_sqs_queue" "sqs_example" {
     maxReceiveCount     = 2
   })
 
-  tags = merge(local.tags, { Type = "sqs" })
+  tags = var.tags
 }
 
+##### SQS role #####
 resource "aws_iam_role" "sqs_role" {
-  count = var.lab_role_arn == "" ? 1 : 0
-  name  = "sqs_role-${var.base_name}"
-
+  name               = "sqs_role-${var.base_name}"
   assume_role_policy = data.aws_iam_policy_document.sqs_assume_role_policy.json
 }
 
@@ -40,19 +33,20 @@ data "aws_iam_policy_document" "sqs_assume_role_policy" {
   }
 }
 
+#Attach the SQS as a source event of the lambda
 resource "aws_lambda_event_source_mapping" "sqs_lambda_binder" {
   event_source_arn = aws_sqs_queue.sqs_example.arn
   function_name    = var.destination_lambda_arn
   batch_size       = 1
 }
 
+##### SQS policy to send and receive messages #####
 resource "aws_sqs_queue_policy" "sqs_unencrypted_policy" {
   queue_url = aws_sqs_queue.sqs_example.url
   policy    = data.aws_iam_policy_document.sqs_policy_doc.json
 }
 
 data "aws_iam_policy_document" "sqs_policy_doc" {
-  # "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
   statement {
     actions   = ["SQS:SendMessage", "SQS:ReceiveMessage"]
     resources = [aws_sqs_queue.sqs_example.arn]
@@ -60,4 +54,24 @@ data "aws_iam_policy_document" "sqs_policy_doc" {
   }
 }
 
-data "aws_caller_identity" "current" {}
+### Lambda permission to access SQS ###
+resource "aws_iam_policy" "lambda_sqs_policy" {
+  name        = local.name
+  description = "Allow lambda execution role access SQS"
+  policy      = data.aws_iam_policy_document.lambda_sqs_policy_doc.json
+  tags        = var.tags
+}
+
+# Attach the SQS policy to the lambda role.
+resource "aws_iam_role_policy_attachment" "lambda_sqs_policy_attachment" {
+  role       = var.lambda_role_id
+  policy_arn = aws_iam_policy.lambda_sqs_policy.arn
+}
+
+data "aws_iam_policy_document" "lambda_sqs_policy_doc" {
+  statement {
+    effect    = "Allow"
+    resources = compact([aws_sqs_queue.sqs_example.arn])
+    actions   = ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"]
+  }
+}

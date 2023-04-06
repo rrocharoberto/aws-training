@@ -14,8 +14,3 @@ variable "lambda_function_arn" {
   description = "ARN of the lambda function."
   type        = string
 }
-
-variable "lab_role_arn" {
-  description = "ARN of the role already created to use."
-  type        = string
-}

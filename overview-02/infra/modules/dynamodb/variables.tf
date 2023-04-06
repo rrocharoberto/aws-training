@@ -1,16 +1,12 @@
 # Input variable definitions
 
-variable "base_name" {
-  description = "Base name to use in the resources name."
+variable "table_name" {
+  description = "Name of the DynamoDB table."
   type        = string
 }
 
-variable "destination_lambda_arn" {
-  description = "ARN of the lambda function that will receive the messages from the DynamoDB stream."
-  type        = string
-}
-
-variable "lab_role_arn" {
-  description = "ARN of the role already created to use."
-  type        = string
+variable "tags" {
+  description = "A mapping of default tags to assign to the resources"
+  type        = map(string)
+  default     = {}
 }

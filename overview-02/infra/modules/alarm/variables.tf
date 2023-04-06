@@ -15,3 +15,9 @@ variable "sns_arn" {
   type        = string
   default     = ""
 }
+
+variable "tags" {
+  description = "A mapping of default tags to assign to the resources"
+  type        = map(string)
+  default     = {}
+}

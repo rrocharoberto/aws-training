@@ -5,7 +5,8 @@ variable "base_name" {
   type        = string
 }
 
-variable "lab_role_arn" {
-  description = "ARN of the role already created to use."
-  type        = string
+variable "tags" {
+  description = "A mapping of default tags to assign to the resources"
+  type        = map(string)
+  default     = {}
 }

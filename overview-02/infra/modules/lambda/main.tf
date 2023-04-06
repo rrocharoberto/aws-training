@@ -1,90 +1,85 @@
 locals {
   name = "lambda-${var.base_name}"
-  tags = {
-    Environment = "Test"
-    Owner       = "Roberto Rocha"
-    Creator     = "Terraform"
-    Resource    = local.name
+  env_vars = {
+    SERVICE     = var.service_name
+    ENVIRONMENT = var.environment
   }
 }
 
+##### Lambda resources #####
 resource "aws_lambda_function" "lambda_example" {
   function_name = local.name
-  description   = "My first lambda function :)."
-  handler       = var.lambda_class_name
-  runtime       = "java11"
+  description   = "Lambda function for demo."
+  handler       = var.lambda_handler
+  runtime       = var.runtime
   timeout       = 15
   memory_size   = 512
 
-  s3_bucket = var.s3_bucket_id
+  s3_bucket = var.lambda_bucket_id
   s3_key    = aws_s3_object.s3_object_lambda.key
 
+  environment {
+    variables = var.env_vars == null ? local.env_vars : merge(local.env_vars, var.env_vars)
+  }
 
-  role = var.lab_role_arn != "" ? var.lab_role_arn : aws_iam_role.lambda_exec_role[0].arn
+  role = aws_iam_role.lambda_role.arn
 
   source_code_hash = filebase64sha256(var.lambda_source_file)
-  tags             = merge(local.tags, { Type = "Lambda" })
+  tags             = var.tags
 }
 
 resource "aws_s3_object" "s3_object_lambda" {
-  bucket = var.s3_bucket_id
-  key    = "${local.name}.jar"
+  bucket = var.lambda_bucket_id
+  key    = var.s3_object_name
   source = var.lambda_source_file
   etag   = filemd5(var.lambda_source_file)
-  tags   = local.tags
+  tags   = var.tags
 }
 
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
   name              = "/aws/lambda/${aws_lambda_function.lambda_example.function_name}"
   retention_in_days = 14
+  tags              = var.tags
 }
 
-#########################################################
-#The resources below will not be used because of LabRole.
-#########################################################
-resource "aws_iam_role" "lambda_exec_role" {
-  count = var.lab_role_arn == "" ? 1 : 0
-  name  = "lambda-role-${var.base_name}"
+# Lambda role
+resource "aws_iam_role" "lambda_role" {
+  name               = "lambda-assumeRole-${var.base_name}"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
+  tags               = var.tags
+}
 
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
-    "arn:aws:iam::aws:policy/AWSLambdaExecute",
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-    #      ,aws_iam_policy.lambda_policy.arn
-  ]
+data "aws_iam_policy_document" "lambda_assume_role_policy" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect   = "Allow"
-      Action   = ["s3:ListAllMyBuckets", "s3:ListBucket", "s3:HeadBucket"]
-      Resource = [var.s3_bucket_arn]
-      },
-      {
-        Effect   = "Allow"
-        Action   = ["s3:GetObject"]
-        Resource = [aws_s3_object.s3_object_lambda.acl]
-      },
+# Attach the logging policy to the lambda role.
+resource "aws_iam_role_policy_attachment" "lambda_log_policy_attachment" {
+  role       = aws_iam_role.lambda_role.id
+  policy_arn = aws_iam_policy.lambda_log_policy.arn
+}
+
+resource "aws_iam_policy" "lambda_log_policy" {
+  name        = "lambda-log-policy-${var.base_name}"
+  description = "Allow lambda execution role access to CloudWatch logs"
+  policy      = data.aws_iam_policy_document.lambda_log_policy_doc.json
+  tags        = var.tags
+}
+
+data "aws_iam_policy_document" "lambda_log_policy_doc" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
     ]
-  })
+    resources = ["arn:aws:logs:*:*:*"]
+  }
 }
-
-resource "aws_iam_role_policy_attachment" "lambda_policy_att" {
-  count      = var.lab_role_arn == "" ? 1 : 0
-  role       = aws_iam_role.lambda_exec_role[0].name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-}
-
-# resource "aws_iam_policy" "lambda_policy" {
-#   name = "lambda-policy-${local.name}"
-#   policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Action   = ["s3:ListAllMyBuckets", "s3:ListBucket", "s3:HeadBucket"],
-#         Effect   = "Allow",
-#         Resource = "*"
-#       },
-#     ]
-#   })
-# }

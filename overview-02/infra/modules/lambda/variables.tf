@@ -1,5 +1,15 @@
 # Input variable definitions
 
+variable "service_name" {
+  description = "Name of the service."
+  type        = string
+}
+
+variable "environment" {
+  description = "Environment of deployment."
+  type        = string
+}
+
 variable "base_name" {
   description = "Base name to use in the resources name."
   type        = string
@@ -10,22 +20,34 @@ variable "lambda_source_file" {
   type        = string
 }
 
-variable "lambda_class_name" {
-  description = "Full name of the lambda class."
+variable "lambda_handler" {
+  description = "Full name of the lambda handler."
   type        = string
 }
 
-variable "s3_bucket_id" {
+variable "runtime" {
+  description = "Runtime to run the lambda handler."
+  type        = string
+}
+
+variable "lambda_bucket_id" {
   description = "Id of the S3 bucket."
   type        = string
 }
 
-variable "s3_bucket_arn" {
-  description = "ARN of the S3 bucket."
+variable "s3_object_name" {
+  description = "Name of the S3 object."
   type        = string
 }
 
-variable "lab_role_arn" {
-  description = "ARN of the role already created to use."
-  type        = string
+variable "env_vars" {
+  description = "A mapping of environment variables the lambda must have"
+  type        = map(string)
+  default     = {}
+}
+
+variable "tags" {
+  description = "A mapping of default tags to assign to the resources"
+  type        = map(string)
+  default     = {}
 }

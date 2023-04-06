@@ -5,9 +5,14 @@ variable "base_name" {
   type        = string
 }
 
-variable "email_recipient" {
-  description = "Email to receive the SNS messages."
+variable "lambda_role_id" {
+  description = "The Id of the IAM role of the lambda to which the policy should be applied."
   type        = string
+}
+
+variable "dynamo_table_arn" {
+  type        = string
+  description = "Arn of the dynamodb table"
 }
 
 variable "tags" {

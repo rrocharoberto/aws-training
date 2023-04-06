@@ -1,15 +1,5 @@
-locals {
-  name = "${var.base_name}-message"
-  tags = {
-    Environment = "Test"
-    Owner       = "Roberto Rocha"
-    Creator     = "Terraform"
-    Resource    = local.name
-  }
-}
-
-resource "aws_dynamodb_table" "table_example" {
-  name         = local.name
+resource "aws_dynamodb_table" "table_message" {
+  name         = var.table_name
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "messageId"
   #range_key        = "messageCategory"
@@ -36,13 +26,5 @@ resource "aws_dynamodb_table" "table_example" {
 
   #  lifecycle {ignore_changes = [write_capacity, read_capacity]}
 
-  tags = merge(local.tags, { Type = "dynamo" })
-}
-
-resource "aws_lambda_event_source_mapping" "lambda_dynamo_mapping" {
-  event_source_arn       = aws_dynamodb_table.table_example.stream_arn
-  function_name          = var.destination_lambda_arn
-  starting_position      = "LATEST"
-  batch_size             = 1
-  maximum_retry_attempts = 2
+  tags = var.tags
 }

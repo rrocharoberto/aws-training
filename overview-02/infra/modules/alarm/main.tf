@@ -1,11 +1,5 @@
 locals {
   name = "alarm-${var.base_name}"
-  tags = {
-    Environment = "Test"
-    Owner       = "Roberto Rocha"
-    Creator     = "Terraform"
-    Resource    = local.name
-  }
 }
 
 resource "aws_cloudwatch_metric_alarm" "lambda_alarm" {
@@ -15,7 +9,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_alarm" {
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 2
   threshold           = 0
-  period              = 60 #1 minuto
+  period              = 60 #1 minute
   unit                = "Count"
 
   namespace   = "AWS/Lambda"
@@ -29,11 +23,8 @@ resource "aws_cloudwatch_metric_alarm" "lambda_alarm" {
     FunctionName = var.lambda_function_name
   }
 
+  #sns integration
   alarm_actions = [var.sns_arn]
 
-  #slack test
-  #alarm_actions = [var.sns_slack_arn]
-  #ok_actions    = [aws_sns_topic.sns.arn]
-
-  tags = merge(local.tags, { Type = "Alarm" })
+  tags = var.tags
 }
