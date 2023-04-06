@@ -1,11 +1,10 @@
 locals {
-  name = "Billing_Alert"
+  name = "Billing_Alert-${var.base_name}"
 }
 
 resource "aws_cloudwatch_metric_alarm" "billing_alarm" {
   alarm_name        = local.name
   alarm_description = "Alarm for billing."
-  type              = "Metric alarm"
 
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
