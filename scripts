@@ -1,1 +1,32 @@
 
+#start a small EC2 instance with Ubuntu and run the commands below:
+
+sudo apt-get update
+sudo apt-get install maven
+sudo apt-get install awscli
+
+git clone https://github.com/rrocharoberto/aws-training.git
+
+cd ~/aws-training/overview-01/app
+mvn clean install
+
+mkdir ~/.aws
+vi ~/.aws/credentials
+
+#paste your credentials and save the file
+
+export REGION=us-east-1
+export BUCKET_NAME=roberto-aula-11521
+export SOURCE_JAR_FILE=./lambda-02/target/lambda-02-0.1.jar
+
+aws s3api create-bucket --bucket $BUCKET_NAME --region=$REGION
+
+aws s3api put-object --bucket $BUCKET_NAME --key lambda-02.jar --body $SOURCE_JAR_FILE
+
+
+#Cleanup the environment:
+
+aws s3api delete-bucket --bucket $BUCKET_NAME
+
+aws ec2 terminate-instances --region=$REGION --instance-ids i-0a1b68e3e31926228
+
