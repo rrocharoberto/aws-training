@@ -1,5 +1,8 @@
 
-#start a small EC2 instance with Ubuntu and run the commands below:
+#start a small EC2 instance with Ubuntu
+ssh -i key.ppk user@instance_ip
+
+Run the commands below:
 
 sudo apt-get update
 sudo apt-get install maven
@@ -26,7 +29,13 @@ aws s3api put-object --bucket $BUCKET_NAME --key lambda-02.jar --body $SOURCE_JA
 
 #Cleanup the environment:
 
+aws s3 rm s3://$BUCKET_NAME --recursive
 aws s3api delete-bucket --bucket $BUCKET_NAME
+aws lambda delete-function --region $REGION --function-name Lambda01
+aws lambda delete-function --region $REGION --function-name Lambda02
+aws sqs delete-queue --region $REGION --queue-url https://sqs.us-east-1.amazonaws.com/145562821625/FilaAula03
+aws logs delete-log-group --region $REGION --log-group-name /aws/lambda/Lambda01
+aws logs delete-log-group --region $REGION --log-group-name /aws/lambda/Lambda02
 
-aws ec2 terminate-instances --region=$REGION --instance-ids i-0a1b68e3e31926228
+aws ec2 terminate-instances --region=$REGION --instance-ids $EC2_INSTANCE_ID
 
