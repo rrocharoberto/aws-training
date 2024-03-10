@@ -51,3 +51,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "lab_role_arn" {
+  description = "ARN of the LabRole already created to use."
+  type        = string
+  default     = ""
+}

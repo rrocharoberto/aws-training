@@ -17,5 +17,5 @@ output "lambda_function_invoke_arn" {
 
 output "lambda_role_id" {
   description = "Id of the lambda role."
-  value       = aws_iam_role.lambda_role.id
+  value       = var.lab_role_arn == "" ? aws_iam_role.lambda_role[0].id : "LabRole"
 }

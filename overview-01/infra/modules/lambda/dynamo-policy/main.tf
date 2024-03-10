@@ -4,6 +4,7 @@ locals {
 
 ### Lambda permission to access DynamoDB ###
 resource "aws_iam_policy" "lambda_dynamo_operation_policy" {
+  count       = var.lab_role_arn == "" ? 1 : 0
   name        = local.name
   description = "Allow lambda execution role access DynamoDB table"
   policy      = data.aws_iam_policy_document.lambda_dynamodb_operation_policy_doc.json
@@ -12,8 +13,9 @@ resource "aws_iam_policy" "lambda_dynamo_operation_policy" {
 
 # Attach the dynamo policy to the lambda role.
 resource "aws_iam_role_policy_attachment" "lambda_dynamo_operation_policy_attachment" {
+  count      = var.lab_role_arn == "" ? 1 : 0
   role       = var.lambda_role_id
-  policy_arn = aws_iam_policy.lambda_dynamo_operation_policy.arn
+  policy_arn = aws_iam_policy.lambda_dynamo_operation_policy[0].arn
 }
 
 data "aws_iam_policy_document" "lambda_dynamodb_operation_policy_doc" {

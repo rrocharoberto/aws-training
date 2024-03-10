@@ -6,6 +6,7 @@ resource "aws_s3_bucket" "lambda_bucket" {
 }
 
 resource "aws_s3_bucket_acl" "bucket_acl" {
+  count  = var.lab_role_arn == "" ? 1 : 0
   bucket = aws_s3_bucket.lambda_bucket.id
   acl    = "private"
 }
